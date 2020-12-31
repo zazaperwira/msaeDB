@@ -25,7 +25,7 @@ Benchmarking in Small Area Estimation is a modification of Small Area
 Estimation model to guarantees that the aggreagate weighted mean of the
 county predictors equals the corresponding weighted mean of survey
 estimates. Difference Benchmarking is the simplest but widely used by
-multiplying EBLUP estimator by the common adjustment factor (J.N.K Rao
+multiplying EBLUP estimator by the common adjustment factors (J.N.K Rao
 and Isabela Molina, 2013).
 
 ## Authors
