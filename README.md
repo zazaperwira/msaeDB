@@ -9,6 +9,8 @@
 status](https://travis-ci.com/zazaperwira/msaeDB.svg?branch=master)](https://travis-ci.com/zazaperwira/msaeDB)
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/zazaperwira/msaeDB?branch=master&svg=true)](https://ci.appveyor.com/project/zazaperwira/msaeDB)
+[![Codecov test
+coverage](https://codecov.io/gh/zazaperwira/msaeDB/branch/master/graph/badge.svg)](https://codecov.io/gh/zazaperwira/msaeDB?branch=master)
 <!-- badges: end -->
 
 The goal of msaeDB is to implement Benchmarking Method for Multivariate
