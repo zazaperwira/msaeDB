@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![Travis build
+status](https://travis-ci.com/zazaperwira/msaeDB.svg?branch=master)](https://travis-ci.com/zazaperwira/msaeDB)
 <!-- badges: end -->
 
 The goal of msaeDB is to implement Benchmarking Method for Multivariate
