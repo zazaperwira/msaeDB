@@ -15,45 +15,45 @@ usaedb(
 )
 }
 \arguments{
-\item{formula}{list of formula that describe the fitted model}
+\item{formula}{List of formula that describe the fitted model}
 
-\item{vardir}{Sampling variance of direct estimation, if the data is included in data frame so it is the vector with the name of sampling variances. if it is not, it is a data frame of sampling variance in order : \code{var1, cov12,.,cov1r,var2,cov23,.,cov2r.,.cov(r-1)(r),var(r)}}
+\item{vardir}{Sampling variances of direct estimations, if the data is included in data frame so it is the vector with the name of sampling variances. if it is not, it is a data frame of sampling variance in order : \code{var1, cov12,.,cov1r,var2,cov23,.,cov2r,.,.,cov(r-1)(r),var(r)}}
 
-\item{weight}{Vector of proportion of units in small area}
+\item{weight}{Sampling weights or proportion of units in small area}
 
 \item{samevar}{Whether the variances of the data is same or not. Logical input with default \code{FALSE}}
 
 \item{MAXITER}{Maximum number of iteration in Fisher-scoring algorithm with default \code{100}}
 
-\item{PRECISION}{Limit of fisher-scoring convergence tolerance with default \code{1e-4}}
+\item{PRECISION}{Limit of Fisher-scoring convergence tolerance with default \code{1e-4}}
 
 \item{data}{The data frame}
 }
 \value{
 This function returns a list of the following objects:
-   \item{USAE_Eblup}{a dataframe with the values of the EBLUPs estimators}
-   \item{MSE_Eblup}{a dataframe with the values of estimated mean square errors of EBLUPs estimators}
-   \item{fit}{a list containing the following objects:}
+   \item{USAE_Eblup}{A dataframe with the values of the EBLUPs estimators}
+   \item{MSE_Eblup}{A dataframe with the values of estimated mean square errors of EBLUPs estimators}
+   \item{fit}{A list containing the following objects:}
      \itemize{
        \item method : The fitting method (this function is using "REML")
-       \item convergence : the convergence result of fisher scoring algorithm (Logical Value)
+       \item convergence : The convergence result of Fisher-scoring algorithm (Logical Value)
        \item iterations : The number of Fisher-Scoring algorithm iterations
-       \item estcoef : a dataframe with the estimated model coefficient, standard error,t statistics, p-values of the significance of each coefficient
-       \item refvar : a dataframe with estimated random effect variance
-       \item informationFisher : a matrix of information fisher from Fisher-scoring algorithm
+       \item estcoef : A dataframe with the estimated model coefficient, standard error,t statistics, p-values of the significance of each coefficient
+       \item refvar : A dataframe with estimated random effect variances
+       \item informationFisher : A matrix of information fisher from Fisher-scoring algorithm
      }
 
    \item{difference_benchmarking}{a list containing the following objects:}
      \itemize{
-       \item Estimation : a dataframe with the value of Benchmarked EBLUPs estimators
-       \item Aggregation : The Aggregation of benchmarked EBLUPs estimations, EBLUPs Estimations and direct estimations
-       \item MSE_DB : a dataframe with the values of estimated mean square errors of benchmarked EBLUPs estimators
-       \item g.4a : first component of g4 in difference benchmarking MSE estimation formula
-       \item g.4b : second component of g4 in difference benchmarking MSE estimation formula
+       \item Estimation : A dataframe with the value of Benchmarked EBLUPs estimators
+       \item Aggregation : The aggregation of benchmarked EBLUPs estimators, EBLUPs estimators and direct estimations
+       \item MSE_DB : A dataframe with the values of estimated mean square errors of benchmarked EBLUPs estimators
+       \item g.4a : First component of g4 in difference benchmarking MSE estimation formula
+       \item g.4b : Second component of g4 in difference benchmarking MSE estimation formula
      }
 }
 \description{
-This function produces EBLUPs, MSE, and Aggregarion of Univariat SAE with Difference Benchmarking
+This function produces EBLUPs, MSE, and aggregation of Univariate SAE with Difference Benchmarking
 }
 \examples{
 ##load dataset
@@ -80,10 +80,10 @@ formula = list(f1 = datamsaeDB$Y1~datamsaeDB$X1+datamsaeDB$X2,
                f2 = datamsaeDB$Y2~datamsaeDB$X2,
                f3 = datamsaeDB$Y3~datamsaeDB$X1)
 vardir = datamsaeDB[,c("v1","v12","v13","v2","v23","v3")]
-#Note : in real data for univariate SAE, if you does not have the valuse of covariances,
+#Note : in real data for univariate SAE, if you does not have the values of covariances,
 #       set covariancse as zero in the dataframe
 weight = datamsaeDB[,c("w1","w2","w3")]
-usaeDB <- usaedb(formula, vardir, weight = weight)
+usaeDB_d <- usaedb(formula, vardir, weight = weight)
 
 usaeDB$USAE_Eblup       #to see EBLUP Estimators
 usaeDB$MSE_Eblup        #to see estimated MSE of EBLUP estimators

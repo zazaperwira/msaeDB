@@ -13,20 +13,20 @@ status](https://ci.appveyor.com/api/projects/status/github/zazaperwira/msaeDB?br
 coverage](https://codecov.io/gh/zazaperwira/msaeDB/branch/master/graph/badge.svg)](https://codecov.io/gh/zazaperwira/msaeDB?branch=master)
 <!-- badges: end -->
 
-The goal of msaeDB is to implement Benchmarking Method for Multivariate
-Small Area Estimation under Fay Herriot Model.  
-Multivariate Small Area Estimation (MSAE) is a development of Univariat
-Small Area Estimation that considering the correlation among response
-variables and borrowing the strength from auxiliary variables
-effectiveness of a domain sample size, the multivariat model in this
-package is based on Multivariate model 1 proposed by Roberto Benavent
-and Domigo Morales (2015) \<DOI: 10.1016/j.csda.2015.07.013.\>.
-Benchmarking in Small Area Estimation is a modification of Small Area
-Estimation model to guarantees that the aggreagate weighted mean of the
-county predictors equals the corresponding weighted mean of survey
-estimates. Difference Benchmarking is the simplest but widely used by
-multiplying EBLUP estimator by the common adjustment factors (J.N.K Rao
-and Isabela Molina, 2013).
+This Package is implementing Benchmarking Method for Multivariate Small
+Area Estimation under Fay Herriot Model. Multivariate Small Area
+Estimation (MSAE) is a development of Univariate Small Area Estimation
+that considering the correlation among response variables and borrowing
+the strength from auxiliary variables effectiveness of a domain sample
+size, the multivariate model in this package is based on Multivariate
+model 1 proposed by Roberto Benavent and Domigo Morales (2015) \<DOI:
+10.1016/j.csda.2015.07.013.\>. Benchmarking in Small Area Estimation is
+a modification of Small Area Estimation model to guarantees that the
+aggregate weighted mean of the county predictors equals the
+corresponding weighted mean of survey estimates. Difference Benchmarking
+is the simplest benchmarking method but widely used by multiplying EBLUP
+estimator by the common adjustment factors (J.N.K Rao and Isabela
+Molina, 2013).
 
 ## Authors
 
