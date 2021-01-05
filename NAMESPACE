@@ -2,8 +2,8 @@
 
 export(msaedb)
 export(msaefh)
-export(usaedb)
-export(usaefh)
+export(saedb)
+export(saefh)
 import(MASS)
 import(magic)
 import(stats)

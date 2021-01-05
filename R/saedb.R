@@ -1,14 +1,15 @@
-#' @title EBLUPs under Univariate Fay Herriot Model
-#' @description This function produces EBLUPs, MSE of Univariate SAE
+#' @title EBLUPs under Univariate Fay Herriot Model with Difference Benchmarking
+#' @description This function produces EBLUPs, MSE, and aggregation of Univariate SAE with Difference Benchmarking
 #' @param formula List of formula that describe the fitted model
-#' @param vardir  Sampling variances of direct estimations, if the data is included in data frame so it is the vector with the name of sampling variances. if it is not, it is a data frame of sampling variance in order : \code{var1, cov12,.,cov1r,var2,cov23,.,cov2r,.,.,cov(r-1)(r),var(r)}
-#' @param samevar Whether the variances of the data is same or not. Logical input with default \code{FALSE}
+#' @param vardir  Sampling variances of direct estimations,if it is included in data frame so it is the vector with the name of sampling variances.if it is not, it is a data frame of sampling variance in order : \code{var1, cov12,.,cov1r,var2,cov23,.,cov2r,.,cov(r-1)(r),var(r)}
+#' @param weight  Known proportion of units in small areas, where \eqn{\sum_{d=1}^{D}}{sum from d=1 to D of} \eqn{W_{rd}}{Wrd} = 1 . \code{d = 1...D}  is the number of small areas, and \code{r = 1...R}  is the number of response variables
+#' @param samevar Whether the variances of the data are same or not. Logical input with default \code{FALSE}
 #' @param MAXITER Maximum number of iteration in Fisher-scoring algorithm with default \code{100}
 #' @param PRECISION Limit of Fisher-scoring convergence tolerance with default \code{1e-4}
 #' @param data The data frame
 #'
 #' @return This function returns a list of the following objects:
-#'    \item{USAE_Eblup}{A dataframe with the values of the EBLUPs estimators}
+#'    \item{SAE_Eblup}{A dataframe with the values of the EBLUPs estimators}
 #'    \item{MSE_Eblup}{A dataframe with the values of estimated mean square errors of EBLUPs estimators}
 #'    \item{fit}{A list containing the following objects:}
 #'      \itemize{
@@ -20,8 +21,17 @@
 #'        \item informationFisher : A matrix of information fisher from Fisher-scoring algorithm
 #'      }
 #'
-#' @examples
+#'    \item{difference_benchmarking}{a list containing the following objects:}
+#'      \itemize{
+#'        \item Estimation : A dataframe with the value of Benchmarked EBLUPs estimators
+#'        \item Aggregation : The aggregation of benchmarked EBLUPs estimators, EBLUPs estimators and direct estimations
+#'        \item MSE_DB : A dataframe with the values of estimated mean square errors of benchmarked EBLUPs estimators
+#'        \item g.4a : First component of g4 in difference benchmarking MSE estimation formula
+#'        \item g.4b : Second component of g4 in difference benchmarking MSE estimation formula
+#'      }
 #'
+#'
+#' @examples
 #' ##load dataset
 #' data(datamsaeDB)
 #'
@@ -38,7 +48,8 @@
 #' #Note : in real data for univariate SAE, if you does not have the valuse of covariances,
 #' #       set covariancse as zero in the dataframe
 #'
-#' usaeFH <- usaefh(formula, vardir, data=datamsaeDB)
+#' weight = c("w1","w2","w3")
+#' saeDB <- saedb(formula, vardir, weight, data=datamsaeDB)
 #'
 #' ##Do not use parameter 'data'
 #' formula = list(f1 = datamsaeDB$Y1~datamsaeDB$X1+datamsaeDB$X2,
@@ -47,21 +58,28 @@
 #' vardir = datamsaeDB[,c("v1","v12","v13","v2","v23","v3")]
 #' #Note : in real data for univariate SAE, if you does not have the values of covariances,
 #' #       set covariancse as zero in the dataframe
-#' usaeFH_d <- usaefh(formula, vardir)
+#' weight = datamsaeDB[,c("w1","w2","w3")]
+#' saeDB_d <- saedb(formula, vardir, weight = weight)
 #'
-#' usaeFH$USAE_Eblup       #to see EBLUP Estimators
-#' usaeFH$MSE_Eblup        #to see estimated MSE of EBLUP estimators
+#' saeDB$SAE_Eblup        #to see EBLUP Estimators
+#' saeDB$MSE_Eblup        #to see estimated MSE of EBLUP estimators
+#' saeDB$difference_benchmarking$Estimation   #to see Benchmarked EBLUP Estimators
+#' saeDB$difference_benchmarking$MSE_DB       #to see estimated MSE of Benchmarked EBLUP Estimators
+#' saeDB$difference_benchmarking$Aggregation  #to see the aggregation of, benchmarking
 #'
+#' @export saedb
 #'
-#' @export usaefh
-#'
-usaefh <- function (formula, vardir, samevar = FALSE, MAXITER = 100, PRECISION = 1e-04,
+saedb <- function (formula, vardir, weight, samevar = FALSE, MAXITER = 100, PRECISION = 1e-04,
                     data) {
 
-  result = list(USAE_Eblup = NA, MSE_Eblup = NA,
+  result = list(SAE_Eblup = NA, MSE_Eblup = NA,
                 fit = list(method = NA, convergence = NA, iterations = NA,
-                           estcoef = NA, refvar = NA, informationFisher = NA))
-
+                           estcoef = NA, refvar = NA, informationFisher = NA),
+                difference_benchmarking = list(Estimation = NA,
+                                               Aggregation = NA,
+                                               MSE_DB = NA,
+                                               g4.a = NA,
+                                               g4.b = NA))
   r <- length(formula)
   RIn_function <- function(vardir, n,r){
     if (r == 1){
@@ -107,10 +125,20 @@ usaefh <- function (formula, vardir, samevar = FALSE, MAXITER = 100, PRECISION =
 
     y.vec <- unlist(lapply(formuladata, function(x){x[1][1]}))
 
+
     x.matrix <- formula
     for(i in 1:r) {x.matrix[[i]] <- model.matrix(formula[[i]], na.action = na.omit, data)}
     x.matrix = Reduce(adiag,x.matrix)
+    w.matrix = as.matrix(data[,weight])
+
     n = length(y.vec)/r
+
+    if (any(is.na(data[, weight])))
+      stop("Object weight contains NA values.")
+    if (!all(weight %in% names(data)))
+      stop("Object weight is not appropiate with data")
+    if (length(weight) != r)
+      stop("Length of weight is not appropiate, the length must be ",r)
     if (any(is.na(data[, vardir])))
       stop("Object vardir contains NA values.")
     if (!all(vardir %in% names(data)))
@@ -129,6 +157,9 @@ usaefh <- function (formula, vardir, samevar = FALSE, MAXITER = 100, PRECISION =
     x.matrix <- formula
     for(i in 1:r) {x.matrix[[i]] <- model.matrix(formula[[i]], na.action = na.omit)}
     x.matrix = Reduce(adiag,x.matrix)
+
+    w.matrix = as.matrix(weight)
+
     n = length(y.vec)/r
 
     if ((dim(vardir)[2] != sum(1:r)) && (dim(vardir)[1] != n)) {
@@ -136,9 +167,15 @@ usaefh <- function (formula, vardir, samevar = FALSE, MAXITER = 100, PRECISION =
     }
     if (any(is.na(vardir)))
       stop("Object vardir contains NA values.")
+    if ((dim(weight)[2] != r) && (dim(vardir)[1] != n)) {
+      stop("Object weight is not appropiate with data, it must be ",n," x ",r," matrix")
+    }
+    if (any(is.na(weight)))
+      stop("Object weight contains NA values.")
     RIn = RIn_function(vardir,n, r)*diag(n*r)
 
   }
+
   for (i in 1:r) {
     if (attr(attributes(formuladata[[i]])$terms, "response") ==
         1)
@@ -149,12 +186,14 @@ usaefh <- function (formula, vardir, samevar = FALSE, MAXITER = 100, PRECISION =
       stop("Argument formula= ", textformula, " contains NA values.")
     }
   }
+
   varnames_Y <- lapply(formula, function(x) {x[[2]]})
   In = diag(n)
   Ir = diag(r)
   d.sigma <- lapply(formula, function(x){x=matrix(0,r,r)})
   for (i in 1:r) {d.sigma[[i]][i, i] = 1}
   d.SIGMA <- lapply(d.sigma, function(x){kronecker(x,In)})
+
   convergence = TRUE
   if (samevar) {
     Varu <- median(diag(RIn))
@@ -181,6 +220,7 @@ usaefh <- function (formula, vardir, samevar = FALSE, MAXITER = 100, PRECISION =
     if (k >= MAXITER && diff >= PRECISION) {
       convergence = FALSE
     }
+
     GIn   <- kronecker(diag(Varu), In)
     SIGMA <-  (GIn + RIn)
     SIGMA_inv <- solve(SIGMA)
@@ -190,8 +230,8 @@ usaefh <- function (formula, vardir, samevar = FALSE, MAXITER = 100, PRECISION =
     Py    <- P %*% y.vec
     beta.REML <- Q %*% Xt_Si %*% y.vec
     resid <- y.vec - x.matrix %*% beta.REML
-    USAE_Eblup<- data.frame(matrix(x.matrix %*% beta.REML + GIn %*% SIGMA_inv %*% resid, n, r))
-    colnames(USAE_Eblup) = varnames_Y
+    SAE_Eblup<- data.frame(matrix(x.matrix %*% beta.REML +GIn %*% SIGMA_inv %*% resid,n, r))
+    colnames(SAE_Eblup) = varnames_Y
     std.err.beta   <- sqrt(diag(Q))
     tvalue         <- beta.REML/std.err.beta
     pvalue         <- 2 * pnorm(abs(tvalue), lower.tail = FALSE)
@@ -199,15 +239,51 @@ usaefh <- function (formula, vardir, samevar = FALSE, MAXITER = 100, PRECISION =
     colnames(coef) = c("beta", "std.error", "t.statistics","p.value")
     Bi  <- RIn%*%solve(SIGMA)
     m   <- dim(x.matrix)[1]
+    p   <- dim(x.matrix)[2]
     I   <- diag(m)
     g1d <- diag(Bi%*%GIn)
     g2d <- diag(Bi%*%x.matrix%*%Q%*%t(x.matrix)%*%t(Bi))
     dg  <- SIGMA_inv - (I-Bi) %*% SIGMA_inv
     g3d <- diag(dg %*% SIGMA %*% t(dg))/F
+
+    W   <- diag(as.vector(w.matrix))
+    g4.a<- matrix(0,m,m)
+    for (i in 1:r){
+      g4.a <- g4.a + d.SIGMA[[i]]*sum(diag(d.SIGMA[[i]]%*%W%*%Bi%*%SIGMA%*%t(W)%*%t(Bi)))
+    }
+    g4.a   <- diag(g4.a)
+
+    g4.b   <- matrix(0,r,r)
+    for (k in 0:(r-1)) {
+      for (i in (k*30+1):((k+1)*n)) {
+        xdi<- matrix(x.matrix[i, ], nrow = 1, ncol = p)
+        for (j in (k*30+1):((k+1)*n)) {
+          xdj <- matrix(x.matrix[j, ], nrow = 1, ncol = p)
+          g4.b<- g4.b + d.sigma[[k+1]]*as.numeric(W[i,i]*W[j,j]*Bi[i,i]*Bi[j,j]*as.numeric(xdi %*% Q %*% t(xdj)))
+        }
+      }
+    }
+    g4.b   <- diag(kronecker(g4.b,In))
+    g4d    <- g4.a - g4.b
+
+
+    g4.a  <- as.data.frame(matrix(g4.a,n,r))
+    g4.a  <- apply(g4.a, 2, median)
+    names(g4.a) <- varnames_Y
+    g4.b  <- as.data.frame(matrix(g4.b,n,r))
+    g4.b  <- apply(g4.b, 2, median)
+    names(g4.b) <- varnames_Y
+
     MSE_Eblup <- g1d + g2d + 2 * g3d
+    MSE_DB    <- g1d + g2d + 2 * g3d + g4d
+
     MSE_Eblup <- data.frame(matrix(MSE_Eblup, n, r))
+    MSE_DB    <- data.frame(matrix(MSE_DB, n, r))
     names(MSE_Eblup) = varnames_Y
+    names(MSE_DB)    = varnames_Y
+
   } else {
+
     Varu <- apply(matrix(diag(RIn), n, r), 2, median)
     k    <- 0
     diff <- rep(PRECISION + 1, r)
@@ -234,6 +310,7 @@ usaefh <- function (formula, vardir, samevar = FALSE, MAXITER = 100, PRECISION =
           F[j,i] <-  0.5*sum(diag(P %*% d.SIGMA[[i]] %*% P %*% d.SIGMA[[j]]))
         }
       }
+
       Varu  <- Varu1 + solve(F) %*% s
       diff  <- abs((Varu - Varu1)/Varu1)
       k     <- k + 1
@@ -257,34 +334,89 @@ usaefh <- function (formula, vardir, samevar = FALSE, MAXITER = 100, PRECISION =
     Py    <- P %*% y.vec
     beta.REML <- Q %*% Xt_Si %*% y.vec
     resid <- y.vec - x.matrix %*% beta.REML
-    USAE_Eblup <- data.frame(matrix (x.matrix %*% beta.REML + GIn %*% SIGMA_inv %*% resid,n, r))
-    colnames(USAE_Eblup) = varnames_Y
+    SAE_Eblup <- data.frame(matrix(x.matrix %*% beta.REML + GIn %*% SIGMA_inv %*% resid,n, r))
+    colnames(SAE_Eblup) = varnames_Y
     std.err.beta <- sqrt(diag(Q))
     tvalue       <- beta.REML/std.err.beta
     pvalue       <- 2 * pnorm(abs(tvalue), lower.tail = FALSE)
     coef         <- cbind(beta.REML, std.err.beta, tvalue, pvalue)
-    colnames(coef)<- c("beta", "std.error", "t.statistics", "p.value")
+    colnames(coef)= c("beta", "std.error", "t.statistics","p.value")
     F_inv <- solve(F)
     Bi    <- RIn%*%solve(SIGMA)
     m     <- dim(x.matrix)[1]
+    p     <- dim(x.matrix)[2]
     I     <- diag(m)
+
     g1d   <- diag(Bi%*%GIn)
     g2d   <- diag(Bi%*%x.matrix%*%Q%*%t(x.matrix)%*%t(Bi))
-    dg    <- lapply(d.SIGMA, function(x) x %*% SIGMA_inv - GIn %*%SIGMA_inv %*% x %*% SIGMA_inv)
+
+    dg    <- lapply(d.SIGMA, function(x) x %*% SIGMA_inv - GIn %*%
+                      SIGMA_inv %*% x %*% SIGMA_inv)
     g3d = list()
     for (i in 1:r) {
       for (j in 1:r) {
-        g3d[[(i - 1) * r + j]] = F_inv[i, j] * (dg[[i]] %*%SIGMA %*% t(dg[[j]]))
+        g3d[[(i - 1) * r + j]] = F_inv[i, j] * (dg[[i]] %*%
+                                                  SIGMA %*% t(dg[[j]]))
       }
     }
     g3d   <- diag(Reduce("+", g3d))
 
-    MSE_Eblup <- g1d + g2d + 2 * g3d
-    MSE_Eblup <- data.frame(matrix(MSE_Eblup, n, r))
-    names(MSE_Eblup) = varnames_Y
+    W     <- diag(as.vector(w.matrix))
+    g4.a  <- matrix(0,m,m)
+    for (i in 1:r){
+      g4.a<- g4.a + d.SIGMA[[i]]*sum(diag(d.SIGMA[[i]]%*%W%*%Bi%*%SIGMA%*%t(W)%*%t(Bi)))
+    }
+    g4.a  <- diag(g4.a)
+    g4.b  <- matrix(0,r,r)
+    for (k in 0:(r-1)) {
+      for (i in (k*30+1):((k+1)*n)) {
+        xdi <- matrix(x.matrix[i, ], nrow = 1, ncol = p)
+        for (j in (k*30+1):((k+1)*n)) {
+          xdj <- matrix(x.matrix[j, ], nrow = 1, ncol = p)
+          g4.b<- g4.b + d.sigma[[k+1]]*as.numeric(W[i,i]*W[j,j]*Bi[i,i]*Bi[j,j]*as.numeric(xdi %*% Q %*% t(xdj)))
+        }
+      }
+    }
+    g4.b  <- diag(kronecker(g4.b,In))
+    g4d   <- g4.a - g4.b
 
+    g4.a  <- as.data.frame(matrix(g4.a,n,r))
+    g4.a  <- apply(g4.a, 2, median)
+    names(g4.a) <- varnames_Y
+    g4.b  <- as.data.frame(matrix(g4.b,n,r))
+    g4.b  <- apply(g4.b, 2, median)
+    names(g4.b) <- varnames_Y
+
+    MSE_Eblup <- g1d + g2d + 2 * g3d
+    MSE_DB    <- g1d + g2d + 2 * g3d + g4d
+
+    MSE_Eblup <- data.frame(matrix(MSE_Eblup, n, r))
+    MSE_DB    <- data.frame(matrix(MSE_DB, n, r))
+    names(MSE_Eblup) = varnames_Y
+    names(MSE_DB)    = varnames_Y
   }
-  result$USAE_Eblup = signif(USAE_Eblup, digits = 5)
+
+  y.direct  <- matrix(y.vec, n,r)
+  colnames(y.direct) = varnames_Y
+  W <- as.matrix(w.matrix)
+
+  SAE_DB <- matrix(NA,n,r)
+  for (i in 1:r) {
+    SAE_DB[,i] <- SAE_Eblup[,i] + (sum(y.direct[,i]*W[,i])-sum(SAE_Eblup[,i]*W[,i]))
+  }
+  colnames(SAE_DB) <- varnames_Y
+  SAE_DB <- as.data.frame(SAE_DB)
+
+  Aggregation_Direct <- colSums(as.matrix(y.direct)*(W))
+  Aggregation_DB     <- colSums(as.matrix(SAE_DB)*(W))
+  Aggregation_EBLUP  <- colSums(as.matrix(SAE_Eblup)*(W))
+
+  Aggregation <- matrix(unlist(rbind(Aggregation_Direct,Aggregation_DB,Aggregation_EBLUP)),3,r)
+  rownames(Aggregation) <- c("Aggregation_Direct","Aggregation_DB","Aggregation_EBLUP")
+  colnames(Aggregation) <- varnames_Y
+
+
+  result$SAE_Eblup = signif(SAE_Eblup, digits = 5)
   result$MSE_Eblup = signif(MSE_Eblup, digits = 5)
   result$fit$method = "REML"
   result$fit$convergence = convergence
@@ -292,5 +424,10 @@ usaefh <- function (formula, vardir, samevar = FALSE, MAXITER = 100, PRECISION =
   result$fit$estcoef = signif(coef, digits = 5)
   result$fit$refvar = signif(data.frame(t(Varu)), digits = 5)
   result$fit$informationFisher = signif(F, digits = 5)
+  result$difference_benchmarking$Estimation = SAE_DB
+  result$difference_benchmarking$Aggregation = Aggregation
+  result$difference_benchmarking$MSE_DB = MSE_DB
+  result$difference_benchmarking$g4.a = g4.a
+  result$difference_benchmarking$g4.b = g4.b
   return(result)
 }

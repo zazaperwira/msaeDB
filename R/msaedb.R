@@ -1,9 +1,9 @@
 #' @title EBLUPs under Multivariate Fay Herriot Model with Difference Benchmarking
 #' @description This function produces EBLUPs, MSE, and aggregation of Multivariate SAE with Difference Benchmarking
 #' @param formula List of formula that describe the fitted model
-#' @param vardir  Sampling variances of direct estimations, if the data is included in data frame so it is the vector with the name of sampling variances. if it is not, it is a data frame of sampling variance in order : \code{var1, cov12,.,cov1r,var2,cov23,.,cov2r,.,.,cov(r-1)(r),var(r)}
-#' @param weight  Sampling weights or proportion of units in small area
-#' @param samevar Whether the variances of the data is same or not. Logical input with default \code{FALSE}
+#' @param vardir  Sampling variances of direct estimations,if it is included in data frame so it is the vector with the name of sampling variances.if it is not, it is a data frame of sampling variance in order : \code{var1, cov12,.,cov1r,var2,cov23,.,cov2r,.,cov(r-1)(r),var(r)}
+#' @param weight  Known proportion of units in small areas, where \eqn{\sum_{d=1}^{D}}{sum from d=1 to D of} \eqn{W_{rd}}{Wrd} = 1 . \code{d = 1 ... D} is the number of small areas, and \code{r = 1 ... R} is the number of response variables
+#' @param samevar Whether the variances of the data are same or not. Logical input with default \code{FALSE}
 #' @param MAXITER Maximum number of iteration in Fisher-scoring algorithm with default \code{100}
 #' @param PRECISION Limit of Fisher-scoring convergence tolerance with default \code{1e-4}
 #' @param data The data frame
@@ -79,7 +79,7 @@ msaedb <- function (formula, vardir, weight, samevar = FALSE, MAXITER = 100, PRE
                                                g4.a = NA,
                                                g4.b = NA))
   if (length(formula)<=1){
-    stop("this msaeDB is used for at least 2 response variables, your respons variable is ",length(formula))
+    stop("this msaedb() function is used for at least 2 response variables, numbers of your response variables is ",length(formula),". use saedb() function instead")
   }
   r <- length(formula)
   RIn_function <- function(vardir, n,r){
@@ -282,12 +282,7 @@ msaedb <- function (formula, vardir, weight, samevar = FALSE, MAXITER = 100, PRE
     diff <- rep(PRECISION + 1, r)
     while (any(diff > rep(PRECISION, r)) & (k < MAXITER)) {
       Varu1 <- Varu
-      if (r == 1) {
-        G <- Varu1
-      }
-      else {
-        G <- diag(as.vector(Varu1))
-      }
+      G <- diag(as.vector(Varu1))
       GIn   <- kronecker(G, In)
       SIGMA <- GIn + RIn
       SIGMA_inv <- solve(SIGMA)
@@ -313,11 +308,7 @@ msaedb <- function (formula, vardir, weight, samevar = FALSE, MAXITER = 100, PRE
     if (k >= MAXITER && diff >= PRECISION) {
       convergence = FALSE
     }
-    if (r == 1) {
-      G <- Varu
-    }else {
-      G <- diag(as.vector(Varu))
-    }
+    G <- diag(as.vector(Varu))
     GIn   <- kronecker(G, In)
     SIGMA <- GIn + RIn
     SIGMA_inv <- solve(SIGMA)

@@ -12,9 +12,9 @@ A data frame with 30 rows and 14 variables:
   \item{Y3}{Direct Estimation of Y3}
   \item{X1}{Auxiliary variable of X1}
   \item{X2}{Auxiliary variable of X2}
-  \item{w1}{sampling weight of Y1}
-  \item{w2}{sampling weight of Y2}
-  \item{w3}{sampling weight of Y3}
+  \item{w1}{Known proportion of units in small areas of Y1}
+  \item{w2}{Known proportion of units in small areas of Y2}
+  \item{w3}{Known proportion of units in small areas of Y3}
   \item{v1}{Sampling Variance of Y1}
   \item{v12}{Sampling Covariance of Y1 and Y2}
   \item{v13}{Sampling Covariance of Y1 and Y3}

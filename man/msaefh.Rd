@@ -16,9 +16,9 @@ msaefh(
 \arguments{
 \item{formula}{List of formula that describe the fitted model}
 
-\item{vardir}{Sampling variances of direct estimations, if the data is included in data frame so it is the vector with the name of sampling variances. if it is not, it is a data frame of sampling variance in order : \code{var1, cov12,.,cov1r,var2,cov23,.,cov2r,.,.,cov(r-1)(r),var(r)}}
+\item{vardir}{Sampling variances of direct estimations,if it is included in data frame so it is the vector with the name of sampling variances.if it is not, it is a data frame of sampling variance in order : \code{var1, cov12,.,cov1r,var2,cov23,.,cov2r,.,cov(r-1)(r),var(r)}}
 
-\item{samevar}{Whether the variances of the data is same or not. Logical input with default \code{FALSE}}
+\item{samevar}{Whether the variances of the data are same or not. Logical input with default \code{FALSE}}
 
 \item{MAXITER}{Maximum number of iteration in Fisher-scoring algorithm with default \code{100}}
 

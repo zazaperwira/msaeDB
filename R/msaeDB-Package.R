@@ -10,9 +10,9 @@
 #' @section Functions:
 #' \describe{
 #'   \item{\code{link{msaedb}}}{Produces EBLUPs, MSE, and Aggregarion of Multivariat SAE with Difference Benchmarking}
-#'   \item{\code{link{usaedb}}}{Produces EBLUPs, MSE, and Aggregarion of Univariate SAE with Difference Benchmarking}
+#'   \item{\code{link{saedb}}}{Produces EBLUPs, MSE, and Aggregarion of Univariate SAE with Difference Benchmarking}
 #'   \item{\code{link{msaefh}}}{Produces EBLUPs and MSE of Multivariat SAE}
-#'   \item{\code{link{usaefh}}}{Produces EBLUPs and MSE of Univariate SAE}
+#'   \item{\code{link{saefh}}}{Produces EBLUPs and MSE of Univariate SAE}
 #'}
 #' @section Reference:
 #' \itemize{
