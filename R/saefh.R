@@ -35,7 +35,7 @@
 #'                f2 = Y2~X2,
 #'                f3 = Y3~X1)
 #' vardir = c("v1","v12","v13","v2","v23","v3")
-#' #Note : in real data for univariate SAE, if you does not have the valuse of covariances,
+#' #Note : in real data for univariate SAE, if you does not have the values of covariances,
 #' #       set covariancse as zero in the dataframe
 #'
 #' saeFH <- saefh(formula, vardir, data=datamsaeDB)

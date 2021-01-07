@@ -47,19 +47,19 @@ Zaza Yuda Perwira <221710086@stis.ac.id>
 
 ## References
 
-  - Benavent, Roberto & Morales, Domigo. (2016). Multivariate
+  - Benavent, Roberto & Morales, Domingo. (2016). Multivariate
     Fay-Herriot models for small area estimation. Computational
-    Statistics and Data Analysis 94 2016 372-390. DOI:
-    10.1016/j.csda.2015.07.013.
+    Statistics and Data Analysis 94 2016 372-390.
+    <DOI:10.1016/j.csda.2015.07.013>.
   - Rao, J.N.K & Molina. (2015). Small Area Estimation 2nd Edition. New
     York: John Wiley and Sons, Inc.
   - Steorts, Rebecca & Ghosh, Malay. (2013). On estimation of mean
     square Errors of Benchmarked Empirical Bayes Estimators. Article in
-    Statistics Sinica April 2013. DOI: 10.5705/ss.2012.053.
+    Statistics Sinica April 2013. <DOI:10.5705/ss.2012.053>.
   - Ubaidillah, Azka et al. (2019). Multivariate Fay-Herriot models for
     small area estimation with application to household consumption per
     capita expenditure in Indonesia. Journal of Applied Statistics.
-    46:15. 2845-2861. DOI: 10.1080/02664763.2019.1615420.
+    46:15. 2845-2861. <DOI:10.1080/02664763.2019.1615420>.
   - Permatasari, Novia. (2020). Pembangunan paket R pada model Fay
     Herriot multivariat untuk pendugaan area kecil (Bachelor Thesis).
     Jakarta: Polytechnic Statistics of STIS
