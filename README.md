@@ -20,13 +20,13 @@ correlation among response variables and borrowing the strength from
 related areas and auxiliary variables to increase the effectiveness of
 sample size, the multivariate model in this package is based on
 multivariate model 1 proposed by Roberto Benavent and Domingo Morales
-(2015) <doi:10.1016/j.csda.2015.07.013>. Benchmarking in Small Area
-Estimation is a modification of Small Area Estimation model to guarantee
-that the aggregate weighted mean of the county predictors equals the
-corresponding weighted mean of survey estimates. Difference Benchmarking
-is the simplest benchmarking method but widely used by multiplying
-empirical best linear unbiased prediction (EBLUP) estimator by the
-common adjustment factors (J.N.K Rao and Isabel Molina, 2015).
+(2015). Benchmarking in Small Area Estimation is a modification of Small
+Area Estimation model to guarantee that the aggregate weighted mean of
+the county predictors equals the corresponding weighted mean of survey
+estimates. Difference Benchmarking is the simplest benchmarking method
+but widely used by multiplying empirical best linear unbiased prediction
+(EBLUP) estimator by the common adjustment factors (J.N.K Rao and Isabel
+Molina, 2015).
 
 ## Authors
 
